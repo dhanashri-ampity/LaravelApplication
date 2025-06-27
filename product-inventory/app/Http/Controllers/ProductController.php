@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\ProductEventNotification;
+use Illuminate\Support\Facades\Notification;
+use App\Models\User;
 
 class ProductController extends Controller
 {
@@ -56,7 +59,13 @@ class ProductController extends Controller
             'image' => 'nullable|string|max:255',
         ]);
     
-        Product::create($request->all());
+        $product = Product::create($request->all());
+
+        // Notify all users (or filter as needed)
+        foreach (User::all() as $user) {
+            $user->notify(new ProductEventNotification("A new product '{$product->name}' was created!"));
+        }
+
         return redirect()->route('products.index')->with('success', 'Product created!');
     }
 
@@ -91,6 +100,12 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $product->update($request->all());
+
+        // Notify all users
+        foreach (User::all() as $user) {
+            $user->notify(new ProductEventNotification("Product '{$product->name}' was updated!"));
+        }
+
         return redirect()->route('products.index')->with('success', 'Product updated!');
     }
 
@@ -101,6 +116,12 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $product->delete();
+
+        // Notify all users
+        foreach (User::all() as $user) {
+            $user->notify(new ProductEventNotification("Product '{$product->name}' was deleted!"));
+        }
+
         return redirect()->route('products.index')->with('success', 'Product soft-deleted!');
     }
 
@@ -115,6 +136,12 @@ class ProductController extends Controller
     {
         $product = Product::onlyTrashed()->findOrFail($id);
         $product->restore();
+
+        // Notify all users
+        foreach (User::all() as $user) {
+            $user->notify(new ProductEventNotification("Product '{$product->name}' was restored!"));
+        }
+
         return redirect()->route('products.index')->with('success', 'Product restored!');
     }
 
