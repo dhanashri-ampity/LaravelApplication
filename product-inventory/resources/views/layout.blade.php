@@ -9,7 +9,25 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
         <a class="navbar-brand" href="{{ route('products.index') }}">🛒 Product Inventory</a>
+        <!-- Notification dropdown (optional, see below) -->
     </nav>
+
+    <!-- Notification List -->
+    @if(auth()->check())
+        <div class="container mt-2">
+            <div class="alert alert-info p-2">
+                <strong>Notifications:</strong>
+                <ul class="mb-0">
+                    @forelse(auth()->user()->notifications as $notification)
+                        <li>{{ $notification->data['message'] }}</li>
+                    @empty
+                        <li>No notifications.</li>
+                    @endforelse
+                </ul>
+            </div>
+        </div>
+    @endif
+
     <main class="py-4">
         @yield('content')
     </main>
