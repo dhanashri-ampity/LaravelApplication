@@ -22,12 +22,37 @@
         </div>
     @endif
 
-    <form method="GET" action="{{ route('products.index') }}">
-        <input type="text" name="search" placeholder="Search by name" value="{{ request('search') }}">
-        <input type="number" name="min_price" placeholder="Min price" value="{{ request('min_price') }}">
-        <input type="number" name="max_price" placeholder="Max price" value="{{ request('max_price') }}">
-        <button type="submit">Filter</button>
-        <a href="{{ route('products.index') }}">Clear</a>
+    <form method="GET" action="{{ route('products.index') }}" class="mb-4">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control rounded-3" placeholder="Search by name" value="{{ request('search') }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-currency-rupee"></i></span>
+                    <input type="number" name="min_price" class="form-control rounded-3" placeholder="Min price" value="{{ request('min_price') }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-currency-rupee"></i></span>
+                    <input type="number" name="max_price" class="form-control rounded-3" placeholder="Max price" value="{{ request('max_price') }}">
+                </div>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary rounded-3 shadow-sm">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+            </div>
+            <div class="col-md-2 d-grid">
+                <a href="{{ route('products.index') }}" class="btn btn-outline-secondary rounded-3 shadow-sm">
+                    <i class="bi bi-x-circle"></i> Clear
+                </a>
+            </div>
+        </div>
     </form>
 
     <div class="table-responsive shadow-sm rounded-4">
@@ -49,6 +74,12 @@
                         <td>₹{{ number_format($product->price, 2) }}</td>
                         <td>{{ $product->stock }}</td>
                         <td class="text-center">
+                            @if ($product->image)
+                                <a href="{{ $product->image }}" target="_blank" class="btn btn-sm btn-info me-2">
+                                     View
+                                </a>
+                            @endif
+
                             <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-warning me-2">
                                 ✏️ Edit
                             </a>
