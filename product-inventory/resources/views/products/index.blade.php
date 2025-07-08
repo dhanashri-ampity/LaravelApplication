@@ -4,11 +4,66 @@
 
 
 <div class="container mt-5">
+    <!-- Dashboard Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-2">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">📊 Total Stock</h5>
+                    <p class="display-6 fw-bold mb-0">{{ $totalStock }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-2">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">🏆 Top 5 Products (by Stock)</h5>
+                    <ol class="mb-0 ps-3">
+                        @forelse ($topProducts as $prod)
+                            <li class="mb-1 d-flex justify-content-between align-items-center">
+                                <span>
+                                    @if ($prod->image)
+                                        <img src="{{ $prod->image }}" alt="{{ $prod->name }}" style="height:24px; width:auto; border-radius:3px; object-fit:cover; margin-right:6px;">
+                                    @else
+                                        <i class="bi bi-image text-muted" style="font-size:1.1rem; margin-right:6px;"></i>
+                                    @endif
+                                    {{ $prod->name }}
+                                </span>
+                                <span class="badge bg-primary">{{ $prod->stock }}</span>
+                            </li>
+                        @empty
+                            <li class="text-muted">No products</li>
+                        @endforelse
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-2">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">🚨 Out of Stock</h5>
+                    @if ($outOfStock->count())
+                        <ul class="list-unstyled mb-0">
+                            @foreach ($outOfStock as $prod)
+                                <li><span class="badge bg-danger">{{ $prod->name }}</span></li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <span class="text-success">All products in stock</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">📦 Product List</h2>
         <div>
             <a href="{{ route('products.create') }}" class="btn btn-success rounded-3">
                 ➕ Add Product
+            </a>
+            <a href="{{ route('products.export.csv') }}" class="btn btn-info rounded-3 ms-1">
+                ⬇️ Download CSV
             </a>
             <a href="{{ route('products.trashed') }}" class="btn btn-warning btn-sm ms-1">
                 🗑️ View Trashed Products
@@ -75,8 +130,8 @@
                         <td>{{ $product->stock }}</td>
                         <td class="text-center">
                             @if ($product->image)
-                                <a href="{{ $product->image }}" target="_blank" class="btn btn-sm btn-info me-2">
-                                     View
+                                <a href="{{ $product->image }}" target="_blank" class="btn btn-outline-info btn-sm me-2" title="View Image">
+                                    <i class="bi bi-eye"></i> View Image
                                 </a>
                             @endif
 
@@ -91,10 +146,7 @@
                                     onclick="return confirm('Are you sure to delete this product?')">
                                     🗑️ Delete
                                 </button>
-                                
-
                             </form>
-                        
                         </td>
                     </tr>
                 @empty

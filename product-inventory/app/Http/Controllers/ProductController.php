@@ -36,7 +36,12 @@ class ProductController extends Controller
 
         $products = $query->get();
 
-        return view('products.index', compact('products'));
+        // --- Dashboard Stats ---
+        $totalStock = Product::sum('stock');
+        $topProducts = Product::orderBy('stock', 'desc')->take(5)->get();
+        $outOfStock = Product::where('stock', '<=', 0)->get();
+
+        return view('products.index', compact('products', 'totalStock', 'topProducts', 'outOfStock'));
     }
 
     /**
@@ -143,6 +148,35 @@ class ProductController extends Controller
         }
 
         return redirect()->route('products.index')->with('success', 'Product restored!');
+    }
+
+    public function exportCsv()
+    {
+        $products = Product::all();
+        $filename = 'products_' . date('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=$filename",
+        ];
+
+        $columns = ['Name', 'Price', 'Stock', 'Image URL'];
+
+        $callback = function() use ($products, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($products as $product) {
+                fputcsv($file, [
+                    $product->name,
+                    $product->price,
+                    $product->stock,
+                    $product->image,
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
 }

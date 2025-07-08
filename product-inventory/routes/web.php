@@ -25,3 +25,5 @@ Route::get('/test-mail', function () {
     });
     return 'Mail sent!';
 });
+
+Route::get('products/export/csv', [ProductController::class, 'exportCsv'])->name('products.export.csv');
